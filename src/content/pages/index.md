@@ -1,79 +1,67 @@
 ---
 _schema: default
-title: Astro Minimal Starter
+title: Outliers — Interesting Things, Better Finds
 seo:
   page_description: >-
-    A starting point for developers looking to build a website with Astro, using
-    Editable Regions in CloudCannon.
+    Discover distinctive furniture, lighting, home goods, and unexpected finds.
+    Curated overstock, warehouse discoveries, and unique pieces at great prices.
   canonical_url:
   featured_image:
   featured_image_alt:
   author_twitter_handle:
-  open_graph_type:
+  open_graph_type: website
   no_index: false
 hero_block:
   _name: Hero
-  heading: Astro Minimal Starter
+  heading: Good things don't always follow the usual path.
   subheading: >-
-    A **minimal** starting point for developers looking to build a website with
-    Astro, using Editable Regions in CloudCannon. Create your own copy, and
-    start creating your own components to use in the Visual Editor. 
+    A curated collection of interesting finds, distinctive pieces, and
+    unexpected discoveries. From warehouse treasures to overstock and
+    one-of-a-kind finds, there's always something worth looking at.
 
-
-    Once you've explored this minimal starter, consider  taking a look at the
-    [Astro Component
-    Starter](https://github.com/CloudCannon/astro-component-starter) to assist
-    in building out your components.
+    We believe great things deserve a second look.
   image:
     image_path: /src/assets/images/transparent-bg/undraw-online-test.svg
-    alt_text: An illustration of someone leaning against a desktop computer monitor.
+    alt_text: Outliers curated collection
   button:
-    text: Get Started
-    link: https://github.com/CloudCannon/astro-starter/
+    text: Explore the collection
+    link: /shop/
 content_blocks:
   - _name: LeftRight
-    heading: Keep what you need. Delete the rest.
+    heading: Not your ordinary shopping experience.
     text_content: >-
-      This starter aims to get developers building their own site quickly in
-      CloudCannon. It strikes a balance between minimal boilerplate and useful
-      features out of the box:
+      We find the things that stand out. Furniture, lighting, home accessories,
+      and interesting pieces that might otherwise go unnoticed.
 
+      - Distinctive furniture and home decor
+      - Overstock and warehouse discoveries
+      - Previous collections and discontinued pieces
+      - Unique finds at exceptional prices
 
-      - Tailwind CSS v4
-
-      - Blog with pagination & tags
-
-      - Visual editing with Editable Regions
-
-      - Header and Footer controls
-
-      - Create and delete pages
-
-      - SEO controls
+      Good design doesn't need to come with a premium price tag.
     image:
       image_path: /src/assets/images/transparent-bg/undraw-hello.svg
-      alt_text: An illustration of someone sitting at a desk with a monitor and books.
+      alt_text: A curated selection of interesting finds
     flipped: true
-    button: {}
+    button:
+      text: Browse all finds
+      link: /shop/
   - _name: LeftRight
-    heading: You choose your editing experience.
+    heading: Every find has a story.
     text_content: >-
-      A flexible git-backed CMS that specialises in editing markdown and data
-      files.
+      Some things are discovered in warehouses. Others come from changing
+      collections, unexpected opportunities, or people looking for a new home
+      for something special.
 
+      We're always looking for the interesting, the overlooked, and the
+      unexpected.
 
-      Visual editing allows you to preview your changes live before you save
-      them.
-
-
-      Git-backed means you can keep all your familiar git workflows, while
-      providing an easy-to-understand interface for non-technical editors to
-      collaborate via git.
+      That's what makes Outliers different.
     image:
       image_path: /src/assets/images/transparent-bg/undraw-startup.svg
-      alt_text: An illustration of someone sitting at a desk.
+      alt_text: Discovering unexpected treasures
     flipped: false
     button:
-      text: CloudCannon Docs
-      link: https://cloudcannon.com/documentation/
+      text: About Outliers
+      link: /about/
 ---
