@@ -92,7 +92,7 @@ function strapiLoader(query: StrapiQueryOptions) {
 const stores = defineCollection({
   loader: strapiLoader({
     contentType: "store",
-    filter: "filters[active]=true",
+    filter: `filters[slug][$eq]=${STORE_SLUG}`,
     populate: "seo.socialImage,logo,urls,favicon",
   }),
   schema: baseStrapiSchema

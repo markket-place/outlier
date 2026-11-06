@@ -5,7 +5,7 @@ import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://tiny-jackal.cloudvent.net/",
+  site: "https://outlier.markket.place/",
   integrations: [react(), editableRegions(), mdx()],
   image: {
     // SVG sources are passed through the image pipeline by the component globs.

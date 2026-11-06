@@ -2,77 +2,246 @@
 import { header } from "../../../data/navigation.json";
 ---
 
-<header class="bg-white">
-  <div class="mx-auto max-w-6xl px-8">
-    <nav class="flex items-center justify-between py-4">
-      <a href={header.logo_url}>
-        <img class="h-12 w-auto" src={header.logo} alt={header.logo_alt_text} />
-      </a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="wordmark" href="/" aria-label="Outliers home">
+      <span class="wordmark-main">outliers<span>.</span></span>
+      <span class="wordmark-caption">A MARKKËT MARKETPLACE</span>
+    </a>
 
-      <ul class="hidden sm:flex items-center gap-6">
-        {header.links.map((link) => (
-          <li>
-            <a class="text-gray-700 hover:text-gray-500 transition-colors" href={link.link}>
-              {link.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      {header.links.map((link) => <a href={link.link}>{link.text}</a>)}
+      <a class="shop-link" href="/products/">Shop collection <span>↗</span></a>
+    </nav>
 
-      <button
-        class="sm:hidden p-2"
-        aria-label="Open navigation menu"
-        popovertarget="mobile-menu"
-        popovertargetaction="show"
+    <button
+      class="menu-button"
+      aria-label="Open navigation menu"
+      popovertarget="mobile-menu"
+      popovertargetaction="show"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+        <path d="M3 7h18M3 12h18M3 17h18"></path>
+      </svg>
+    </button>
 
-      <div popover id="mobile-menu" class="fixed inset-0 m-0 w-full h-full max-w-none max-h-none border-none bg-white z-50">
-        <div class="flex flex-col h-full">
-        <div class="mx-auto w-full max-w-6xl flex items-center justify-between px-8 py-4">
-          <a href={header.logo_url}>
-            <img class="h-12 w-auto" src={header.logo} alt={header.logo_alt_text} />
+    <div popover id="mobile-menu" class="mobile-menu">
+      <div class="mobile-menu-inner">
+        <div class="mobile-menu-top">
+          <a class="wordmark" href="/">
+            <span class="wordmark-main">outliers<span>.</span></span>
+            <span class="wordmark-caption">A MARKKËT MARKETPLACE</span>
           </a>
           <button
-            class="p-2"
+            class="menu-button"
             aria-label="Close navigation menu"
             popovertarget="mobile-menu"
             popovertargetaction="hide"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M5 5l14 14M19 5L5 19"></path>
             </svg>
           </button>
         </div>
-        <ul class="flex flex-1 flex-col items-center justify-center gap-0 divide-y divide-gray-200">
-          {header.links.map((link) => (
-            <li class="w-full max-w-xs text-center">
-              <a class="block py-5 text-2xl font-medium text-gray-800 hover:text-blue-600 transition-colors" href={link.link}>
-                {link.text}
+
+        <nav class="mobile-nav" aria-label="Mobile navigation">
+          <a href="/">Home <span>↗</span></a>
+          {
+            header.links.map((link) => (
+              <a href={link.link}>
+                {link.text} <span>↗</span>
               </a>
-            </li>
-          ))}
-        </ul>
-        </div>
+            ))
+          }
+          <a href="/products/">Shop collection <span>↗</span></a>
+        </nav>
+
+        <p class="mobile-note">Good finds. Unexpected places.</p>
       </div>
-    </nav>
+    </div>
   </div>
 </header>
 
 <style>
-  #mobile-menu {
-    opacity: 0;
-    transition: opacity 200ms ease, display 200ms allow-discrete, overlay 200ms allow-discrete;
+  .site-header {
+    position: relative;
+    z-index: 20;
+    background: #f8f7f3;
+    border-bottom: 1px solid #e9e7dc;
   }
-  #mobile-menu:popover-open {
+
+  .header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 7%;
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+  }
+
+  .wordmark {
+    display: flex;
+    flex-direction: column;
+    color: #303328;
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  .wordmark-main {
+    font-family: Georgia, serif;
+    font-size: 34px;
+    letter-spacing: -0.07em;
+  }
+
+  .wordmark-main span {
+    color: #858960;
+  }
+
+  .wordmark-caption {
+    margin-top: 6px;
+    font-size: 8px;
+    letter-spacing: 0.17em;
+    color: #858378;
+  }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .desktop-nav a {
+    color: #55564c;
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .desktop-nav a:hover {
+    color: #858960;
+  }
+
+  .desktop-nav .shop-link {
+    padding: 12px 17px;
+    color: #f8f7f3;
+    background: #303328;
+  }
+
+  .desktop-nav .shop-link span {
+    margin-left: 8px;
+    color: #c3c5a7;
+  }
+
+  .menu-button {
+    display: none;
+    padding: 8px;
+    border: 0;
+    background: transparent;
+    color: #303328;
+    cursor: pointer;
+  }
+
+  .menu-button svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    padding: 0;
+    background: #f8f7f3;
+    color: #303328;
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      display 200ms allow-discrete,
+      overlay 200ms allow-discrete;
+  }
+
+  .mobile-menu:popover-open {
     opacity: 1;
   }
+
   @starting-style {
-    #mobile-menu:popover-open {
+    .mobile-menu:popover-open {
       opacity: 0;
+    }
+  }
+
+  .mobile-menu-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 25px 7%;
+  }
+
+  .mobile-menu-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+  }
+
+  .mobile-nav a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid #e2e0d5;
+    color: #303328;
+    font-family: Georgia, serif;
+    font-size: 30px;
+    text-decoration: none;
+  }
+
+  .mobile-nav a span {
+    color: #858960;
+    font-family: sans-serif;
+    font-size: 15px;
+  }
+
+  .mobile-note {
+    color: #858378;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 700px) {
+    .header-inner {
+      min-height: 76px;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .menu-button {
+      display: block;
     }
   }
 </style>

@@ -1,0 +1,416 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+
+const [stores, products] = await Promise.all([
+  getCollection("stores"),
+  getCollection("products"),
+]);
+
+const store = stores[0];
+
+if (!store) {
+  throw new Error("Store not found. Check PUBLIC_STORE_SLUG.");
+}
+
+const storeData = store.data;
+const activeProducts = products.filter(({ data }) => data.active !== false);
+
+const getImage = (media: any) => {
+  if (!media) return null;
+  const url = media.formats?.medium?.url || media.url;
+  if (!url) return null;
+  return url.startsWith("http")
+    ? url
+    : `${import.meta.env.PUBLIC_STRAPI_URL || "https://api.markket.place"}${url}`;
+};
+
+const formatPrice = (price: number | string) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(Number(price));
+
+const description =
+  storeData.description ||
+  "Unexpected finds, useful things, and exceptional value from our warehouse and partners.";
+---
+
+<Layout
+  title={storeData.seo?.metaTitle || `${storeData.title} | Markkët`}
+  seo={{
+    page_description:
+      storeData.seo?.metaDescription || description,
+  }}
+>
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">A MARKKËT MARKETPLACE</p>
+        <h1>Good finds.<br /><em>Unexpected places.</em></h1>
+        <p class="hero-description">
+          A changing collection of warehouse finds, overstock, previous
+          collections, and interesting things worth discovering.
+        </p>
+        <a class="button" href="#collection">Explore the collection</a>
+      </div>
+      <div class="hero-note">
+        <span>CURATED FINDS</span>
+        <span>WAREHOUSE FINDS</span>
+        <span>LIMITED QUANTITIES</span>
+      </div>
+    </section>
+
+    <!-- Introduction -->
+    <section class="intro">
+      <p class="eyebrow">NOT YOUR USUAL STORE</p>
+      <h2>There's always something<br />worth a second look.</h2>
+      <p>
+        We bring together useful products, unusual discoveries, and
+        overlooked inventory from warehouses and independent partners.
+        Some things are here for a while. Others won't be here tomorrow.
+      </p>
+    </section>
+
+    <!-- Products -->
+    <section class="collection" id="collection">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE CURRENT SELECTION</p>
+          <h2>Find your outlier.</h2>
+        </div>
+        <span>{activeProducts.length} items</span>
+      </div>
+
+      {activeProducts.length > 0 ? (
+        <div class="product-grid">
+          {activeProducts.map(({ id, data }) => {
+            const image = getImage(data.thumbnail);
+            const price = data.usd_price ?? data.prices?.[0]?.price;
+            const title =
+              data.seo?.metaTitle || data.title || "Untitled product";
+            const productSlug = data.slug;
+
+            return (
+              <article class="product-card">
+                <a
+                  class="product-image"
+                  href={productSlug ? `/products/${productSlug}/` : "#collection"}
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={data.thumbnail?.alternativeText || title}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="image-placeholder">OUTLIER</div>
+                  )}
+                  {data.quantity && data.quantity <= 10 && (
+                    <span class="product-badge">LIMITED</span>
+                  )}
+                </a>
+
+                <div class="product-info">
+                  <h3>{title}</h3>
+                  {data.seo?.metaDescription && (
+                    <p>{data.seo.metaDescription}</p>
+                  )}
+                  <div class="product-bottom">
+                    <strong>
+                      {price != null ? formatPrice(price) : "Ask for price"}
+                    </strong>
+                    {productSlug && (
+                      <a href={`/products/${productSlug}/`}>View item ↗</a>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="empty-state">
+          We're getting the next collection ready. Check back soon.
+        </p>
+      )}
+    </section>
+
+    <!-- Editorial CTA -->
+    <section class="closing">
+      <p class="eyebrow">THE ART OF THE FIND</p>
+      <h2>Not everything needs<br />to be brand new.</h2>
+      <p>
+        Great products come from all kinds of places. We're here to help
+        them find their next home.
+      </p>
+      <a class="button button-light" href="mailto:hello@markket.place">
+        Get in touch
+      </a>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    color: #25251f;
+    background: #f8f7f3;
+  }
+
+  .hero {
+    min-height: 570px;
+    padding: 110px max(7vw, 24px) 32px;
+    background: #e9e7dc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hero-content {
+    max-width: 760px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #777466;
+  }
+
+  h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(54px, 8vw, 100px);
+    line-height: .98;
+    letter-spacing: -.055em;
+    font-weight: 400;
+    margin: 28px 0;
+  }
+
+  h1 em {
+    color: #777b56;
+    font-weight: 400;
+  }
+
+  .hero-description {
+    max-width: 460px;
+    color: #66665c;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 15px 23px;
+    background: #303328;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+
+  .hero-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    border-top: 1px solid #c9c7bb;
+    padding-top: 18px;
+    margin-top: 80px;
+    font-size: 10px;
+    letter-spacing: .13em;
+    color: #777466;
+  }
+
+  .intro {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 110px 24px;
+    text-align: center;
+  }
+
+  .intro h2,
+  .section-heading h2,
+  .closing h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.08;
+    letter-spacing: -.04em;
+    font-weight: 400;
+    margin: 20px 0;
+  }
+
+  .intro > p:last-child,
+  .closing > p:not(.eyebrow) {
+    max-width: 550px;
+    margin: 0 auto;
+    color: #77766d;
+    line-height: 1.8;
+  }
+
+  .collection {
+    padding: 40px max(7vw, 24px) 120px;
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    margin-bottom: 35px;
+  }
+
+  .section-heading h2 {
+    margin-bottom: 0;
+  }
+
+  .section-heading > span {
+    font-size: 12px;
+    color: #77766d;
+    padding-bottom: 8px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 36px 22px;
+  }
+
+  .product-card {
+    min-width: 0;
+  }
+
+  .product-image {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: #eeede7;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+
+  .product-image:hover img {
+    transform: scale(1.04);
+  }
+
+  .image-placeholder {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #a5a394;
+    letter-spacing: .2em;
+    font-size: 12px;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #303328;
+    color: white;
+    padding: 7px 10px;
+    font-size: 9px;
+    letter-spacing: .12em;
+  }
+
+  .product-info {
+    padding-top: 15px;
+  }
+
+  .product-info h3 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 7px;
+  }
+
+  .product-info p {
+    color: #858378;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+  }
+
+  .product-bottom strong {
+    font-size: 15px;
+  }
+
+  .product-bottom a {
+    font-size: 11px;
+    color: #777b56;
+    text-decoration: none;
+  }
+
+  .empty-state {
+    padding: 60px 20px;
+    background: #eeede7;
+    text-align: center;
+    color: #77766d;
+  }
+
+  .closing {
+    padding: 100px 24px;
+    text-align: center;
+    background: #303328;
+    color: #f8f7f3;
+  }
+
+  .closing .eyebrow {
+    color: #c3c5a7;
+  }
+
+  .closing h2 {
+    font-size: clamp(42px, 6vw, 68px);
+  }
+
+  .closing > p:not(.eyebrow) {
+    color: #c9c9bd;
+    margin-bottom: 30px;
+  }
+
+  .button-light {
+    background: #e9e7dc;
+    color: #303328;
+  }
+
+  @media (max-width: 760px) {
+    .hero {
+      min-height: 520px;
+      padding-top: 85px;
+    }
+
+    .hero-note {
+      gap: 12px 20px;
+    }
+
+    .product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 14px;
+    }
+
+    .product-info h3 {
+      font-size: 17px;
+    }
+
+    .product-bottom {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

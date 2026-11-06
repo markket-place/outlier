@@ -1,40 +1,41 @@
+
 {
   "header": {
-    "logo": "/images/logos/astro-minimal-starter-logo.svg",
-    "logo_alt_text": "Astro Minimal Starter by CloudCannon logo",
+    "logo": "",
+    "logo_alt_text": "Outliers",
     "logo_url": "/",
     "links": [
       {
+        "link": "/products/",
+        "text": "Shop"
+      },
+      {
         "link": "/about/",
-        "text": "About"
+        "text": "Our story"
       },
       {
-        "link": "/blog/",
-        "text": "Blog"
-      },
-      {
-        "link": "https://github.com/CloudCannon/astro-starter/",
-        "text": "GitHub"
-      },
-      {
-        "link": "https://cloudcannon.com/",
-        "text": "CloudCannon"
+        "link": "mailto:hello@markket.place",
+        "text": "Contact"
       }
     ]
   },
   "footer": {
-    "logo": "/images/logos/astro-minimal-starter-logo-reversed.svg",
-    "logo_alt_text": "Astro Minimal Starter by CloudCannon logo",
+    "logo": "",
+    "logo_alt_text": "Outliers",
     "logo_url": "/",
-    "copyright": "MyCompany. All rights reserved.",
+    "copyright": "Outliers. All rights reserved.",
     "links": [
       {
-        "link": "/blog/",
-        "text": "Blog"
+        "link": "/products/",
+        "text": "Shop collection"
       },
       {
-        "link": "/feed.xml",
-        "text": "RSS Feed"
+        "link": "/about/",
+        "text": "Our story"
+      },
+      {
+        "link": "/contact",
+        "text": "Contact"
       }
     ]
   }

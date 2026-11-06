@@ -1,0 +1,252 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+const [stores, products] = await Promise.all([
+  getCollection("stores"),
+  getCollection("products"),
+]);
+
+const store = stores[0];
+if (!store) throw new Error("Store not found.");
+
+const storeName = store.data.title || "Outliers";
+
+const activeProducts = products
+  // .filter(({ data }) => data.active === true)
+  .sort((a, b) => (a.data.name || "").localeCompare(b.data.name || ""));
+
+const getImage = (media: any) => {
+  if (!media) return null;
+  return media.formats?.medium?.url || media.url || null;
+};
+
+const formatPrice = (price: number | string) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(Number(price));
+---
+
+<Layout
+  title={`Shop | ${storeName}`}
+  seo={{
+    description: "Browse the latest curated finds, warehouse inventory, and unique discoveries."
+  }}
+>
+  <main>
+    <header class="page-heading">
+      <a href="/">← Back to home</a>
+      <p class="eyebrow">THE COLLECTION</p>
+      <h1>Everything worth finding.</h1>
+      <p>
+        Explore the current selection. Inventory changes, quantities are limited,
+        and every find has a story.
+      </p>
+      <span>{activeProducts.length} products</span>
+    </header>
+
+    <section class="catalog">
+      {activeProducts.length > 0 ? (
+        <div class="product-grid">
+          {activeProducts.map(({ data }) => {
+            const image = getImage(data.thumbnail);
+            const title = data.name || data.seo?.metaTitle || "Untitled product";
+            const price = data.usd_price ?? data.prices?.[0]?.price;
+            const slug = data.slug;
+
+            return (
+              <article class="product-card">
+                <a
+                  class="product-image"
+                  href={slug ? `/products/${slug}/` : "#"}
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={data.thumbnail?.alternativeText || title}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="placeholder">OUTLIER</div>
+                  )}
+                </a>
+
+                <div class="product-info">
+                  <h2>{title}</h2>
+                  {data.description && <p>{data.description}</p>}
+                  <div class="product-bottom">
+                    <strong>
+                      {price != null && Number(price) > 0
+                        ? formatPrice(price)
+                        : "Contact for pricing"}
+                    </strong>
+                    {slug && <a href={`/products/${slug}/`}>View item ↗</a>}
+                  </div>
+                  {data.quantity > 0 && data.quantity <= 10 && (
+                    <small>Only {data.quantity} remaining</small>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="empty">New finds are coming soon. Check back shortly.</p>
+      )}
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    background: #f8f7f3;
+    color: #25251f;
+    min-height: 70vh;
+  }
+
+  .page-heading {
+    padding: 65px max(7vw, 24px) 55px;
+    background: #e9e7dc;
+  }
+
+  .page-heading > a {
+    color: #777b56;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .eyebrow {
+    margin-top: 65px;
+    color: #777466;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+  }
+
+  h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(42px, 7vw, 76px);
+    font-weight: 400;
+    letter-spacing: -.045em;
+    margin: 15px 0;
+  }
+
+  .page-heading > p:not(.eyebrow) {
+    color: #77766d;
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  .page-heading > span {
+    display: block;
+    margin-top: 28px;
+    font-size: 11px;
+    color: #777466;
+  }
+
+  .catalog {
+    padding: 55px max(7vw, 24px) 110px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 42px 22px;
+  }
+
+  .product-card {
+    min-width: 0;
+  }
+
+  .product-image {
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: #eeede7;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+
+  .product-image:hover img {
+    transform: scale(1.04);
+  }
+
+  .placeholder {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #aaa899;
+    letter-spacing: .2em;
+  }
+
+  .product-info {
+    padding-top: 15px;
+  }
+
+  h2 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+
+  .product-info p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #77766d;
+  }
+
+  .product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .product-bottom strong {
+    font-size: 15px;
+  }
+
+  .product-bottom a {
+    font-size: 11px;
+    color: #777b56;
+    text-decoration: none;
+  }
+
+  .product-info small {
+    display: block;
+    margin-top: 10px;
+    color: #777b56;
+    font-size: 11px;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: #77766d;
+  }
+
+  @media (max-width: 760px) {
+    .product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px 14px;
+    }
+
+    h2 {
+      font-size: 17px;
+    }
+
+    .product-bottom {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
