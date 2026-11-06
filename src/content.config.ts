@@ -1,9 +1,8 @@
 import { defineCollection } from "astro:content";
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
+import markket from '../markket.config';
 
-const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL || 'https://api.markket.place';
-const STORE_SLUG = import.meta.env.PUBLIC_STORE_SLUG || 'outlier';
 const SYNC_INTERVAL = 6000;
 
 interface StrapiQueryOptions {
@@ -34,7 +33,7 @@ function strapiLoader(query: StrapiQueryOptions) {
       }
 
       try {
-        const url = new URL(`/api/${query.contentType}s`, STRAPI_URL);
+        const url = new URL(`/api/${query.contentType}s`, markket.api);
 
         if (query.sort) url.searchParams.append("sort", query.sort);
         if (query.populate) url.searchParams.append("populate", query.populate);
@@ -92,8 +91,8 @@ function strapiLoader(query: StrapiQueryOptions) {
 const stores = defineCollection({
   loader: strapiLoader({
     contentType: "store",
-    filter: `filters[slug][$eq]=${STORE_SLUG}`,
-    populate: "seo.socialImage,logo,urls,favicon",
+    filter: `filters[slug][$eq]=${markket.slug}`,
+    populate: "seo.socialImage,logo,urls,favicon,seo",
   }),
   schema: baseStrapiSchema
 });
@@ -101,7 +100,7 @@ const stores = defineCollection({
 const products = defineCollection({
   loader: strapiLoader({
     contentType: "product",
-    filter: `filters[stores][slug][$eq]=${STORE_SLUG}`,
+    filter: `filters[stores][slug][$eq]=${markket.slug}`,
     sort: "slug:DESC",
     populate: "seo,seo.socialImage,thumbnail,slides,prices",
   }),

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import { date } from "astro:schema";
 
 const [stores, products] = await Promise.all([
   getCollection("stores"),
@@ -14,7 +15,7 @@ if (!store) {
 }
 
 const storeData = store.data;
-const activeProducts = products.filter(({ data }) => data.active !== false);
+const activeProducts = products;
 
 const getImage = (media: any) => {
   if (!media) return null;
@@ -40,26 +41,24 @@ const description =
 <Layout
   title={storeData.seo?.metaTitle || `${storeData.title} | Markkët`}
   seo={{
-    page_description:
-      storeData.seo?.metaDescription || description,
+    page_description: storeData.seo?.metaDescription || description,
   }}
 >
   <main>
     <!-- Hero -->
     <section class="hero">
       <div class="hero-content">
-        <p class="eyebrow">A MARKKËT MARKETPLACE</p>
+        <p class="eyebrow">{store.data.title}</p>
         <h1>Good finds.<br /><em>Unexpected places.</em></h1>
         <p class="hero-description">
           A changing collection of warehouse finds, overstock, previous
           collections, and interesting things worth discovering.
         </p>
-        <a class="button" href="#collection">Explore the collection</a>
+        <a class="button" href="/products">Explore the collection</a>
       </div>
       <div class="hero-note">
-        <span>CURATED FINDS</span>
-        <span>WAREHOUSE FINDS</span>
-        <span>LIMITED QUANTITIES</span>
+        <span>Exclusive</span>
+        <span>Warehouse Deals</span>
       </div>
     </section>
 
@@ -67,75 +66,74 @@ const description =
     <section class="intro">
       <p class="eyebrow">NOT YOUR USUAL STORE</p>
       <h2>There's always something<br />worth a second look.</h2>
-      <p>
-        We bring together useful products, unusual discoveries, and
-        overlooked inventory from warehouses and independent partners.
-        Some things are here for a while. Others won't be here tomorrow.
-      </p>
+      <p>Special products for web surfers</p>
     </section>
 
     <!-- Products -->
     <section class="collection" id="collection">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">THE CURRENT SELECTION</p>
-          <h2>Find your outlier.</h2>
+          <p class="eyebrow">Catalogue</p>
+          <h2>Be found.</h2>
         </div>
         <span>{activeProducts.length} items</span>
       </div>
 
-      {activeProducts.length > 0 ? (
-        <div class="product-grid">
-          {activeProducts.map(({ id, data }) => {
-            const image = getImage(data.thumbnail);
-            const price = data.usd_price ?? data.prices?.[0]?.price;
-            const title =
-              data.seo?.metaTitle || data.title || "Untitled product";
-            const productSlug = data.slug;
+      {
+        activeProducts.length > 0 ? (
+          <div class="product-grid">
+            {activeProducts.map(({ data }) => {
+              const image = getImage(data.thumbnail);
+              const price = data.usd_price ?? data.prices?.[0]?.price;
+              const title = data.name || data.seo.metaTitle || "Product";
+              const productSlug = data.slug;
 
-            return (
-              <article class="product-card">
-                <a
-                  class="product-image"
-                  href={productSlug ? `/products/${productSlug}/` : "#collection"}
-                >
-                  {image ? (
-                    <img
-                      src={image}
-                      alt={data.thumbnail?.alternativeText || title}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div class="image-placeholder">OUTLIER</div>
-                  )}
-                  {data.quantity && data.quantity <= 10 && (
-                    <span class="product-badge">LIMITED</span>
-                  )}
-                </a>
-
-                <div class="product-info">
-                  <h3>{title}</h3>
-                  {data.seo?.metaDescription && (
-                    <p>{data.seo.metaDescription}</p>
-                  )}
-                  <div class="product-bottom">
-                    <strong>
-                      {price != null ? formatPrice(price) : "Ask for price"}
-                    </strong>
-                    {productSlug && (
-                      <a href={`/products/${productSlug}/`}>View item ↗</a>
+              return (
+                <article class="product-card">
+                  <a
+                    class="product-image"
+                    href={
+                      productSlug ? `/products/${productSlug}/` : "#collection"
+                    }
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={data.thumbnail?.alternativeText || title}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="image-placeholder">OUTLIER</div>
                     )}
+                    {data.quantity && data.quantity <= 10 && (
+                      <span class="product-badge">LIMITED</span>
+                    )}
+                  </a>
+
+                  <div class="product-info">
+                    <h3>{title}</h3>
+                    {data.seo?.metaDescription && (
+                      <p>{data.seo.metaDescription}</p>
+                    )}
+                    <div class="product-bottom">
+                      <strong>
+                        {price != null ? formatPrice(price) : "Ask for price"}
+                      </strong>
+                      {productSlug && (
+                        <a href={`/products/${productSlug}/`}>View item ↗</a>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      ) : (
-        <p class="empty-state">
-          We're getting the next collection ready. Check back soon.
-        </p>
-      )}
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p class="empty-state">
+            We're getting the next collection ready. Check back soon.
+          </p>
+        )
+      }
     </section>
 
     <!-- Editorial CTA -->
@@ -143,8 +141,8 @@ const description =
       <p class="eyebrow">THE ART OF THE FIND</p>
       <h2>Not everything needs<br />to be brand new.</h2>
       <p>
-        Great products come from all kinds of places. We're here to help
-        them find their next home.
+        Great products come from all kinds of places. We're here to help them
+        find their next home.
       </p>
       <a class="button button-light" href="mailto:hello@markket.place">
         Get in touch
@@ -175,7 +173,7 @@ const description =
   .eyebrow {
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: .16em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: #777466;
   }
@@ -183,8 +181,8 @@ const description =
   h1 {
     font-family: Georgia, serif;
     font-size: clamp(54px, 8vw, 100px);
-    line-height: .98;
-    letter-spacing: -.055em;
+    line-height: 0.98;
+    letter-spacing: -0.055em;
     font-weight: 400;
     margin: 28px 0;
   }
@@ -210,7 +208,7 @@ const description =
     text-decoration: none;
     font-size: 13px;
     font-weight: 600;
-    letter-spacing: .04em;
+    letter-spacing: 0.04em;
   }
 
   .hero-note {
@@ -221,7 +219,7 @@ const description =
     padding-top: 18px;
     margin-top: 80px;
     font-size: 10px;
-    letter-spacing: .13em;
+    letter-spacing: 0.13em;
     color: #777466;
   }
 
@@ -238,7 +236,7 @@ const description =
     font-family: Georgia, serif;
     font-size: clamp(36px, 5vw, 56px);
     line-height: 1.08;
-    letter-spacing: -.04em;
+    letter-spacing: -0.04em;
     font-weight: 400;
     margin: 20px 0;
   }
@@ -295,7 +293,7 @@ const description =
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform .4s ease;
+    transition: transform 0.4s ease;
   }
 
   .product-image:hover img {
@@ -307,7 +305,7 @@ const description =
     display: grid;
     place-items: center;
     color: #a5a394;
-    letter-spacing: .2em;
+    letter-spacing: 0.2em;
     font-size: 12px;
   }
 
@@ -319,7 +317,7 @@ const description =
     color: white;
     padding: 7px 10px;
     font-size: 9px;
-    letter-spacing: .12em;
+    letter-spacing: 0.12em;
   }
 
   .product-info {

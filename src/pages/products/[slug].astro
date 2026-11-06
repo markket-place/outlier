@@ -1,0 +1,384 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import CheckoutModal from "../../components/CheckoutModal";
+
+export async function getStaticPaths() {
+  const products = await getCollection("products");
+  return products.map((p) => ({ params: {
+    slug: p.data?.slug || p.id
+  } }));
+}
+
+const { slug } = Astro.params;
+
+const [products, stores] = await Promise.all([
+  getCollection("products"),
+  getCollection("stores"),
+]);
+
+const product = products.find(({ data }) => data.slug === slug);
+const store = stores[0];
+
+if (!product) {
+  throw new Error(`Product not found: ${slug}`);
+}
+
+if (!store) {
+  throw new Error("Store not found. Check PUBLIC_STORE_SLUG.");
+}
+
+const data = product.data;
+const storeData = store.data;
+const hasCheckout = !!data.sku;
+
+const title =
+  data.name?.trim() ||
+  data.seo?.metaTitle ||
+  "Untitled product";
+
+const description =
+  data.description ||
+  data.seo?.metaDescription ||
+  "";
+
+const price =
+  data.usd_price ?? data.prices?.[0]?.price ?? null;
+
+const validPrices = (data.prices || []).filter(
+  (item) =>
+    item &&
+    item.stripe_id &&
+    Number(item.price) > 0 &&
+    item.hidden !== true
+);
+
+const imageUrl = (media) => {
+  if (!media) return null;
+
+  const url =
+    media.formats?.large?.url ||
+    media.formats?.medium?.url ||
+    media.url;
+
+  if (!url) return null;
+
+  return url.startsWith("http")
+    ? url
+    : `https://api.markket.place${url}`;
+};
+
+const thumbnail = imageUrl(data.thumbnail);
+
+const gallery = [
+  ...(thumbnail ? [thumbnail] : []),
+  ...(data.slides || [])
+    .map((slide) => imageUrl(slide))
+    .filter(Boolean),
+].filter((url, index, array) => array.indexOf(url) === index);
+
+---
+
+<Layout title={` ${data.name} | ${storeData.title}`}}>
+  <main class="product-page">
+    <a href="/products/" class="back-link">
+      <span aria-hidden="true">←</span> Back to the collection
+    </a>
+
+    <div class="product-layout">
+      <section class="gallery" aria-label="Product images">
+        {gallery.length > 0 ? (
+          <>
+            <div class="main-image">
+            <img
+              id="main-product-image"
+              src={gallery[0]}
+              alt={title}
+            />
+          </div>
+          {gallery.length > 1 && (
+            <div class="thumbnails">
+              {gallery.map((image, index) => (
+                <button
+                  class:list={["thumbnail", { selected: index === 0 }]}
+                  type="button"
+                  data-image={image}
+                  aria-label={`View image ${index + 1}`}
+                  aria-pressed={index === 0 ? "true" : "false"}
+                >
+                  <img
+                    src={image}
+                    alt={`${title}, view ${index + 1}`}
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
+          </>
+          ) : (
+          <div class="image-placeholder">
+            A good find, waiting to be pictured.
+          </div>
+        )}
+      </section>
+
+      <section class="product-info">
+        <p class="eyebrow">From the Outliers collection</p>
+
+        <h1>{title}</h1>
+
+        {price !== null && Number(price) > 0 && (
+          <p class="price">${Number(price).toFixed(2)}</p>
+        )}
+
+        {description && (
+          <div class="description">{description}</div>
+        )}
+
+        { hasCheckout ? (
+          <div class="checkout-box">
+            <CheckoutModal
+              client:load
+              prices={validPrices}
+              product={product}
+              store={store}
+            />
+          </div>
+        ) : (
+          <>
+            <p class="availability">
+              {data.active === true
+                ? "Interested in this item? Get in touch for pricing and availability."
+                : "Availability and pricing are confirmed individually."}
+            </p>
+
+            <a class="buy-button" href={inquiryUrl}>
+              Enquire about this item <span>↗</span>
+            </a>
+          </>
+        )}
+
+        <p class="product-note">
+          Unique finds, limited quantities. Questions about this item?
+          <a href="/contact/">Talk to us.</a>
+        </p>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const mainImage = document.querySelector<HTMLImageElement>(
+    "#main-product-image"
+  );
+
+  const thumbnails = document.querySelectorAll<HTMLButtonElement>(
+    ".thumbnail"
+  );
+
+  thumbnails.forEach((button) => {
+    button.addEventListener("click", () => {
+      const image = button.dataset.image;
+
+      if (!image || !mainImage) return;
+
+      mainImage.src = image;
+
+      thumbnails.forEach((thumbnail) => {
+        thumbnail.classList.remove("selected");
+        thumbnail.setAttribute("aria-pressed", "false");
+      });
+
+      button.classList.add("selected");
+      button.setAttribute("aria-pressed", "true");
+    });
+  });
+</script>
+
+<style>
+  .product-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+    color: #29291f;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    color: #77765e;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 160ms ease;
+  }
+
+  .back-link:hover {
+    color: #29291f;
+  }
+
+  .product-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: start;
+  }
+
+  .gallery {
+    min-width: 0;
+  }
+
+  .main-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: #f3f1e9;
+  }
+
+  .main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .thumbnails {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+  }
+
+  .thumbnail {
+    flex: 0 0 76px;
+    padding: 0;
+    overflow: hidden;
+    aspect-ratio: 1;
+    border: 1px solid #e5e2d5;
+    background: #f3f1e9;
+    cursor: pointer;
+  }
+
+  .thumbnail.selected {
+    border: 2px solid #454735;
+  }
+
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-placeholder {
+    display: grid;
+    place-items: center;
+    min-height: 400px;
+    padding: 2rem;
+    background: #f3f1e9;
+    color: #77765e;
+    font-family: Georgia, serif;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .product-info {
+    padding-top: 1.5rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 1.5rem;
+    color: #77765e;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+  }
+
+  .price {
+    margin: 1.5rem 0;
+    font-family: Georgia, serif;
+    font-size: 1.6rem;
+  }
+
+  .description {
+    margin: 2rem 0;
+    color: #747365;
+    font-size: 1rem;
+    line-height: 1.9;
+    white-space: pre-line;
+  }
+
+  .buy-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 2rem;
+    padding: 1.1rem 1.4rem;
+    background: #454735;
+    color: white;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 160ms ease;
+  }
+
+  .buy-button:hover {
+    background: #29291f;
+  }
+
+  .availability {
+    color: #77765e;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .product-note {
+    max-width: 340px;
+    margin-top: 2rem;
+    color: #929081;
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .product-note a {
+    color: #555642;
+  }
+
+  .checkout-box {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f7f6ef;
+    border: 1px solid #e5e2d5;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .product-page {
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .product-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .product-info {
+      padding-top: 0;
+    }
+  }
+</style>

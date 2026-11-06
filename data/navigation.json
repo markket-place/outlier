@@ -14,7 +14,7 @@
         "text": "Our story"
       },
       {
-        "link": "mailto:hello@markket.place",
+        "link": "/contact",
         "text": "Contact"
       }
     ]
@@ -23,7 +23,7 @@
     "logo": "",
     "logo_alt_text": "Outliers",
     "logo_url": "/",
-    "copyright": "Outliers. All rights reserved.",
+    "copyright": ".All rights reserved.",
     "links": [
       {
         "link": "/products/",

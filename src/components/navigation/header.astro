@@ -1,17 +1,19 @@
 ---
+import { getCollection } from "astro:content";
 import { header } from "../../../data/navigation.json";
+const stores = await getCollection("stores");
+const store = stores?.[0]?.data;
 ---
 
 <header class="site-header">
   <div class="header-inner">
-    <a class="wordmark" href="/" aria-label="Outliers home">
-      <span class="wordmark-main">outliers<span>.</span></span>
-      <span class="wordmark-caption">A MARKKËT MARKETPLACE</span>
+    <a class="wordmark" href="/" aria-label={`${store.title} home`}>
+      <span class="wordmark-main">{store.title}<span>.</span></span>
+      <span class="wordmark-caption">{store.seo.metaDescription}</span>
     </a>
 
     <nav class="desktop-nav" aria-label="Main navigation">
       {header.links.map((link) => <a href={link.link}>{link.text}</a>)}
-      <a class="shop-link" href="/products/">Shop collection <span>↗</span></a>
     </nav>
 
     <button
@@ -34,8 +36,8 @@ import { header } from "../../../data/navigation.json";
       <div class="mobile-menu-inner">
         <div class="mobile-menu-top">
           <a class="wordmark" href="/">
-            <span class="wordmark-main">outliers<span>.</span></span>
-            <span class="wordmark-caption">A MARKKËT MARKETPLACE</span>
+            <span class="wordmark-main">{store.title}<span>.</span></span>
+            <span class="wordmark-caption">{store.seo.metaDescription}</span>
           </a>
           <button
             class="menu-button"
@@ -63,7 +65,6 @@ import { header } from "../../../data/navigation.json";
               </a>
             ))
           }
-          <a href="/products/">Shop collection <span>↗</span></a>
         </nav>
 
         <p class="mobile-note">Good finds. Unexpected places.</p>

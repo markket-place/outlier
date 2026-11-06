@@ -10,7 +10,7 @@ const [stores, products] = await Promise.all([
 const store = stores[0];
 if (!store) throw new Error("Store not found.");
 
-const storeName = store.data.title || "Outliers";
+const storeName = store.data.title || "Outlier";
 
 const activeProducts = products
   // .filter(({ data }) => data.active === true)
@@ -32,7 +32,8 @@ const formatPrice = (price: number | string) =>
 <Layout
   title={`Shop | ${storeName}`}
   seo={{
-    description: "Browse the latest curated finds, warehouse inventory, and unique discoveries."
+    description:
+      "Browse the latest curated finds, warehouse inventory, and unique discoveries.",
   }}
 >
   <main>
@@ -41,60 +42,63 @@ const formatPrice = (price: number | string) =>
       <p class="eyebrow">THE COLLECTION</p>
       <h1>Everything worth finding.</h1>
       <p>
-        Explore the current selection. Inventory changes, quantities are limited,
-        and every find has a story.
+        Explore the current selection. Inventory changes, quantities are
+        limited, and every find has a story.
       </p>
       <span>{activeProducts.length} products</span>
     </header>
 
     <section class="catalog">
-      {activeProducts.length > 0 ? (
-        <div class="product-grid">
-          {activeProducts.map(({ data }) => {
-            const image = getImage(data.thumbnail);
-            const title = data.name || data.seo?.metaTitle || "Untitled product";
-            const price = data.usd_price ?? data.prices?.[0]?.price;
-            const slug = data.slug;
+      {
+        activeProducts.length > 0 ? (
+          <div class="product-grid">
+            {activeProducts.map(({ data }) => {
+              const image = getImage(data.thumbnail);
+              const title =
+                data.name || data.seo?.metaTitle || "Untitled product";
+              const price = data.usd_price ?? data.prices?.[0]?.price;
+              const slug = data.slug;
 
-            return (
-              <article class="product-card">
-                <a
-                  class="product-image"
-                  href={slug ? `/products/${slug}/` : "#"}
-                >
-                  {image ? (
-                    <img
-                      src={image}
-                      alt={data.thumbnail?.alternativeText || title}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div class="placeholder">OUTLIER</div>
-                  )}
-                </a>
+              return (
+                <article class="product-card">
+                  <a
+                    class="product-image"
+                    href={slug ? `/products/${slug}/` : "#"}
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={data.thumbnail?.alternativeText || title}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="placeholder">OUTLIER</div>
+                    )}
+                  </a>
 
-                <div class="product-info">
-                  <h2>{title}</h2>
-                  {data.description && <p>{data.description}</p>}
-                  <div class="product-bottom">
-                    <strong>
-                      {price != null && Number(price) > 0
-                        ? formatPrice(price)
-                        : "Contact for pricing"}
-                    </strong>
-                    {slug && <a href={`/products/${slug}/`}>View item ↗</a>}
+                  <div class="product-info">
+                    <h2>{title}</h2>
+                    {data.description && <p>{data.description}</p>}
+                    <div class="product-bottom">
+                      <strong>
+                        {price != null && Number(price) > 0
+                          ? formatPrice(price)
+                          : "Contact for pricing"}
+                      </strong>
+                      {slug && <a href={`/products/${slug}/`}>View item ↗</a>}
+                    </div>
+                    {data.quantity > 0 && data.quantity <= 10 && (
+                      <small>Only {data.quantity} remaining</small>
+                    )}
                   </div>
-                  {data.quantity > 0 && data.quantity <= 10 && (
-                    <small>Only {data.quantity} remaining</small>
-                  )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      ) : (
-        <p class="empty">New finds are coming soon. Check back shortly.</p>
-      )}
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p class="empty">New finds are coming soon. Check back shortly.</p>
+        )
+      }
     </section>
   </main>
 </Layout>
@@ -122,14 +126,14 @@ const formatPrice = (price: number | string) =>
     color: #777466;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: .16em;
+    letter-spacing: 0.16em;
   }
 
   h1 {
     font-family: Georgia, serif;
     font-size: clamp(42px, 7vw, 76px);
     font-weight: 400;
-    letter-spacing: -.045em;
+    letter-spacing: -0.045em;
     margin: 15px 0;
   }
 
@@ -171,7 +175,7 @@ const formatPrice = (price: number | string) =>
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform .4s ease;
+    transition: transform 0.4s ease;
   }
 
   .product-image:hover img {
@@ -183,7 +187,7 @@ const formatPrice = (price: number | string) =>
     display: grid;
     place-items: center;
     color: #aaa899;
-    letter-spacing: .2em;
+    letter-spacing: 0.2em;
   }
 
   .product-info {

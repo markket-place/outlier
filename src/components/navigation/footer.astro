@@ -1,32 +1,33 @@
 ---
+import { getCollection } from "astro:content";
 import { footer } from "../../../data/navigation.json";
+const stores = await getCollection("stores");
+const store = stores?.[0]?.data;
 ---
 
 <footer class="site-footer">
   <div class="footer-main">
     <div class="footer-brand">
       <a class="wordmark" href="/">
-        outliers<span>.</span>
+        {store.title}<span>.</span>
       </a>
       <p>
-        Good finds. Unexpected places.
+        {store.seo.metaDescription}
         <br />
-        A changing collection of warehouse finds, independent brands, and things worth
-        discovering.
       </p>
     </div>
 
     <div class="footer-links">
       <div>
         <p class="footer-label">EXPLORE</p>
-        <a href="/products/">Shop collection</a>
         {footer.links.map((link) => <a href={link.link}>{link.text}</a>)}
       </div>
 
       <div>
         <p class="footer-label">GET IN TOUCH</p>
-        <a href="mailto:hello@markket.place">Contact</a>
-        <a href="https://markket.place">About Markkët ↗</a>
+        <a href=`mailto:${store.slug}@markket.place`>
+          Email us ({store.slug}@markket.place)
+        </a>
       </div>
     </div>
   </div>
